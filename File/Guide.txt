@@ -1,15 +1,43 @@
-First step before package installation :
+LINUX APPLICATION MANAGER – SETUP GUIDE
+----------------------------------------
+----------------------------------------
 
-# check for apt /java/jre package:
+PROJECT OVERVIEW
+------------------
+
+This project demonstrates a simple Linux automation process where an administrator can install or remove packages across multiple servers using SSH.
+Before running the automation script, some prerequisites and configurations must be completed on the admin machine and target servers.
+
+---
+
+1. CHECK PACKAGE MANAGER AND REQUIRED PACKAGES
+
+First verify available package managers and required packages.
+
+Example:
+
+Check if apt/java/jre exists
+
+```
 apt
+```
 
-# To install any package :
+Install a package using yum
+
+```
 yum install java
+```
 
+---
 
+2. RESOLVE CENTOS REPOSITORY ERROR
 
-2- Resolve the error using below code -
+If you are using CentOS 7, you may encounter repository errors because official mirrors are deprecated.
+To resolve this issue, update the repository configuration to use the CentOS Vault.
 
+Run the following commands:
+
+```
 sudo sed -i 's|mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os|#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os|g' /etc/yum.repos.d/CentOS-Base.repo
 
 sudo sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever/os/$basearch/|baseurl=http://vault.centos.org/7.9.2009/os/$basearch/|g' /etc/yum.repos.d/CentOS-Base.repo
@@ -25,67 +53,110 @@ sudo sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever/extras/$base
 sudo sed -i 's|mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=centosplus|#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=centosplus|g' /etc/yum.repos.d/CentOS-Base.repo
 
 sudo sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever/centosplus/$basearch/|baseurl=http://vault.centos.org/7.9.2009/centosplus/$basearch/|g' /etc/yum.repos.d/CentOS-Base.repo
+```
 
+Clean repository cache:
+
+```
 sudo yum clean all
+```
 
+Rebuild repository cache:
+
+```
 sudo yum makecache
+```
 
+---
 
-2- Install Required Packages
+3. INSTALL REQUIRED SSH UTILITIES
 
-On Admin machine install SSH utilities.
+On the admin machine install SSH client tools.
 
+```
 sudo yum install openssh-clients -y
+```
 
-Check SSH:
+Verify SSH installation:
 
+```
 ssh -V
+```
 
-5. Configure Passwordless SSH Login
+---
 
-Admin server should connect to CentOS servers without password.
+4. CONFIGURE PASSWORDLESS SSH LOGIN
 
-Step 1 Generate SSH Key
+To allow automation scripts to connect to servers without entering a password, configure SSH key authentication.
 
-On admin machine
+---
 
+STEP 1 – GENERATE SSH KEY
+
+Run the following command on the admin machine:
+
+```
 ssh-keygen
+```
 
-Press Enter for default options.
+Press Enter to accept default settings.
 
-Files created:
+This will create the following files:
 
+```
 ~/.ssh/id_rsa
 ~/.ssh/id_rsa.pub
+```
 
-Step 2 Copy Key to Servers
+---
+
+STEP 2 – COPY SSH KEY TO SERVERS
+
+Copy the public key to each server.
 
 Example:
 
+```
 ssh-copy-id user@192.168.1.10
+```
 
-Repeat for all servers:(Create on all servers to login password less)
+Repeat this step for all servers:
 
+```
 ssh-copy-id user@192.168.1.25
 ssh-copy-id user@192.168.1.26
- 
-Step 3 Test SSH Login 
+```
 
+---
+
+STEP 3 – TEST PASSWORDLESS LOGIN
+
+Verify that SSH login works without a password.
+
+Example:
+
+```
 ssh user@192.168.1.26
+```
 
-If it logs in without password, configuration is successful.
+If login occurs without asking for a password, configuration is successful.
 
-6. Create Server List
+---
 
-Create file on admin machine:
+5. CREATE SERVER LIST
 
+Create a file on the admin machine that contains all target servers.
+
+Command:
+
+```
 vim servers.txt
+```
 
 Example content:
 
+```
 192.168.1.25
 192.168.1.26
 192.168.1.27
-
-This file contains all servers that will receive patches.
 
