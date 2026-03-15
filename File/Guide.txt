@@ -1,0 +1,91 @@
+First step before package installation :
+
+# check for apt /java/jre package:
+apt
+
+# To install any package :
+yum install java
+
+
+
+2- Resolve the error using below code -
+
+sudo sed -i 's|mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os|#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever/os/$basearch/|baseurl=http://vault.centos.org/7.9.2009/os/$basearch/|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo sed -i 's|mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=updates|#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=updates|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever/updates/$basearch/|baseurl=http://vault.centos.org/7.9.2009/updates/$basearch/|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo sed -i 's|mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=extras|#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=extras|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever/extras/$basearch/|baseurl=http://vault.centos.org/7.9.2009/extras/$basearch/|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo sed -i 's|mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=centosplus|#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=centosplus|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo sed -i 's|#baseurl=http://mirror.centos.org/centos/$releasever/centosplus/$basearch/|baseurl=http://vault.centos.org/7.9.2009/centosplus/$basearch/|g' /etc/yum.repos.d/CentOS-Base.repo
+
+sudo yum clean all
+
+sudo yum makecache
+
+
+2- Install Required Packages
+
+On Admin machine install SSH utilities.
+
+sudo yum install openssh-clients -y
+
+Check SSH:
+
+ssh -V
+
+5. Configure Passwordless SSH Login
+
+Admin server should connect to CentOS servers without password.
+
+Step 1 Generate SSH Key
+
+On admin machine
+
+ssh-keygen
+
+Press Enter for default options.
+
+Files created:
+
+~/.ssh/id_rsa
+~/.ssh/id_rsa.pub
+
+Step 2 Copy Key to Servers
+
+Example:
+
+ssh-copy-id user@192.168.1.10
+
+Repeat for all servers:(Create on all servers to login password less)
+
+ssh-copy-id user@192.168.1.25
+ssh-copy-id user@192.168.1.26
+ 
+Step 3 Test SSH Login 
+
+ssh user@192.168.1.26
+
+If it logs in without password, configuration is successful.
+
+6. Create Server List
+
+Create file on admin machine:
+
+vim servers.txt
+
+Example content:
+
+192.168.1.25
+192.168.1.26
+192.168.1.27
+
+This file contains all servers that will receive patches.
+
